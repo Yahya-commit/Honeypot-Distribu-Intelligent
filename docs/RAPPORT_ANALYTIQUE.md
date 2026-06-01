@@ -1,6 +1,7 @@
 # Rapport analytique — Honeypot Distribué Intelligent
 
-**Auteur :** [Votre nom]  
+**Auteur :** Yahya  
+**Email :** yahyabenelhaim1@gmail.com  
 **Formation :** [Intitulé du cours]  
 **Date :** [JJ/MM/AAAA]  
 **Dépôt GitHub :** [URL du repository]

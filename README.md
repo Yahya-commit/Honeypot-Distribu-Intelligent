@@ -121,7 +121,7 @@ Pour supprimer les volumes : `docker compose down -v`
 
 ## Auteur
 
-[Votre nom] — [Établissement] — 2026
+**Yahya** — yahyabenelhaim1@gmail.com — 2026
 
 ## Licence
 

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Threat Dashboard — Honeypot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Honeypot Distribué — Threat Dashboard</h1>
+    <p class="subtitle">IOC Collector → Visualisation temps quasi-réel</p>
+  </header>
+
+  <section class="stats-grid">
+    <article class="card">
+      <h2>Total IOC</h2>
+      <p class="metric">{{ stats.total_iocs or 0 }}</p>
+    </article>
+    <article class="card">
+      <h2>IPs attaquantes</h2>
+      <p class="metric">{{ stats.unique_attacker_ips or 0 }}</p>
+    </article>
+    <article class="card">
+      <h2>Dernière MAJ</h2>
+      <p class="metric small">{{ stats.generated_at or '—' }}</p>
+    </article>
+  </section>
+
+  {% if stats.by_type %}
+  <section class="card">
+    <h2>Répartition par type</h2>
+    <ul class="tag-list">
+      {% for t, count in stats.by_type.items() %}
+      <li><span class="tag">{{ t }}</span> {{ count }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="card">
+    <h2>Indicateurs récents (200 max)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Valeur</th>
+          <th>Source</th>
+          <th>Vu</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ioc in iocs %}
+        <tr>
+          <td><code>{{ ioc.type }}</code></td>
+          <td class="value">{{ ioc.value[:120] }}{% if ioc.value|length > 120 %}…{% endif %}</td>
+          <td>{{ ioc.source }}</td>
+          <td class="small">{{ ioc.last_seen or ioc.first_seen or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">Aucun IOC — lancez des tests contre Cowrie (port 2222).</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>Projet académique — laboratoire isolé uniquement · Kibana : <a href="http://localhost:5601">:5601</a></p>
+  </footer>
+</body>
+</html>

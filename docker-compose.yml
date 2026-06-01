@@ -1,0 +1,144 @@
+# Honeypot Distribué Intelligent — Laboratoire isolé uniquement
+# NE PAS exposer sur Internet sans pare-feu / VLAN dédié
+
+name: honeypot-distribue
+
+services:
+  # ─── Honeypots ───────────────────────────────────────────────
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: hp-cowrie
+    restart: unless-stopped
+    ports:
+      - "${COWRIE_SSH_PORT:-2222}:2222"
+      - "${COWRIE_TELNET_PORT:-2223}:2223"
+    volumes:
+      - cowrie_logs:/cowrie/cowrie-git/var/log/cowrie
+      - cowrie_downloads:/cowrie/cowrie-git/var/lib/cowrie/downloads
+    networks:
+      - honeynet
+    environment:
+      - COWRIE_TELNET_ENABLED=true
+
+  dionaea:
+    image: dtagdevsec/dionaea:24.04
+    container_name: hp-dionaea
+    restart: unless-stopped
+    cap_add:
+      - NET_BIND_SERVICE
+    ports:
+      - "21:21"       # FTP
+      - "42:42"       # WINS
+      - "135:135"     # MSRPC
+      - "443:443"     # HTTPS trap
+      - "445:445"     # SMB
+      - "1433:1433"   # MSSQL
+      - "1723:1723"   # PPTP
+      - "1883:1883"   # MQTT
+      - "3306:3306"   # MySQL
+      - "5060:5060"   # SIP
+      - "5061:5061"
+    volumes:
+      - dionaea_logs:/opt/dionaea/var/log
+      - dionaea_bistreams:/opt/dionaea/var/dionaea/bistreams
+    networks:
+      - honeynet
+
+  # ─── ELK Stack ───────────────────────────────────────────────
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: hp-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - honeynet
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    container_name: hp-logstash
+    restart: unless-stopped
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - cowrie_logs:/logs/cowrie:ro
+      - dionaea_logs:/logs/dionaea:ro
+    networks:
+      - honeynet
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: hp-kibana
+    restart: unless-stopped
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - honeynet
+
+  # ─── IOC Collector ───────────────────────────────────────────
+  ioc-collector:
+    build: ./ioc-collector
+    container_name: hp-ioc-collector
+    restart: unless-stopped
+    depends_on:
+      - cowrie
+      - dionaea
+    volumes:
+      - cowrie_logs:/logs/cowrie:ro
+      - dionaea_logs:/logs/dionaea:ro
+      - cowrie_downloads:/downloads/cowrie:ro
+      - ioc_data:/data/ioc
+    environment:
+      - POLL_INTERVAL_SEC=${IOC_POLL_INTERVAL:-30}
+      - IOC_OUTPUT_DIR=/data/ioc
+    networks:
+      - honeynet
+
+  # ─── Dashboard léger (complément Kibana) ─────────────────────
+  threat-dashboard:
+    build: ./threat-dashboard
+    container_name: hp-threat-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-8080}:8080"
+    volumes:
+      - ioc_data:/data/ioc:ro
+    environment:
+      - IOC_DATA_DIR=/data/ioc
+    depends_on:
+      - ioc-collector
+    networks:
+      - honeynet
+
+networks:
+  honeynet:
+    driver: bridge
+    name: honeypot-honeynet
+
+volumes:
+  cowrie_logs:
+  cowrie_downloads:
+  dionaea_logs:
+  dionaea_bistreams:
+  es_data:
+  ioc_data:

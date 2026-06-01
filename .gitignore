@@ -1,0 +1,17 @@
+.env
+*.pyc
+__pycache__/
+.venv/
+venv/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+data/ioc/*.tmp
+elasticsearch/
+node_modules/
+
+# Artefacts locaux (les volumes Docker restent hors git)
+ioc/data/local/

@@ -101,7 +101,7 @@ Créer un dépôt vide sur https://github.com/new (sans README), puis :
 
 ```powershell
 git branch -M main
-git remote add origin https://github.com/VOTRE_USERNAME/honeypot-distribue.git
+git remote add origin https://github.com/Yahya-commit/Honeypot-Distribu-Intelligent.git
 git push -u origin main
 ```
 

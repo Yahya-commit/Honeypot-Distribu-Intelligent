@@ -1,0 +1,7 @@
+{
+  "data_view": {
+    "title": "honeypot-attacks-*",
+    "name": "Honeypot Attacks",
+    "timeFieldName": "@timestamp"
+  }
+}

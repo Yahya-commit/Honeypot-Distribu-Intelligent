@@ -31,7 +31,7 @@ services:
       - "42:42"       # WINS
       - "135:135"     # MSRPC
       - "443:443"     # HTTPS trap
-      - "445:445"     # SMB
+      - "8445:445"    # SMB (8445 car 445 est réservé par Windows)
       - "1433:1433"   # MSSQL
       - "1723:1723"   # PPTP
       - "1883:1883"   # MQTT

@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "project": "Honeypot Distribué Intelligent",
+    "version": "1.0",
+    "updated_at": "2026-06-01T11:30:25.886356+00:00"
+  },
+  "stats": {
+    "generated_at": "2026-06-01T11:30:25.886356+00:00",
+    "total_iocs": 2,
+    "unique_attacker_ips": 1,
+    "by_type": {
+      "sha256": 1,
+      "ipv4": 1
+    },
+    "by_source": {
+      "cowrie_download": 1,
+      "cowrie": 1
+    },
+    "top_attackers": [
+      "172.18.0.1"
+    ]
+  },
+  "iocs": [
+    {
+      "type": "sha256",
+      "value": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b",
+      "source": "cowrie_download",
+      "context": {
+        "honeypot": "cowrie",
+        "filename": ".gitignore",
+        "path": "/downloads/cowrie/.gitignore"
+      },
+      "first_seen": "2026-06-01T11:28:25.886442+00:00",
+      "last_seen": "2026-06-01T11:28:25.886442+00:00"
+    },
+    {
+      "type": "ipv4",
+      "value": "172.18.0.1",
+      "source": "cowrie",
+      "context": {
+        "eventid": "cowrie.session.connect",
+        "session": "70be89d4abcc",
+        "timestamp": "2026-06-01T11:28:48.740413Z",
+        "honeypot": "cowrie",
+        "role": "attacker"
+      },
+      "first_seen": "2026-06-01T11:28:55.887364+00:00",
+      "last_seen": "2026-06-01T11:28:55.887364+00:00"
+    }
+  ]
+}
